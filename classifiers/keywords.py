@@ -11,6 +11,6 @@ def classify_keywords(title, description):
     
     if max(scores.values()) == 0:
         return 'other'
-    print(f"Scores: {scores}")  # Debugging line to see scores  
+    print(f"Scores: {scores}")  
     return max(scores, key=scores.get)
 

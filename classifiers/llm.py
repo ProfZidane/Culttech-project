@@ -83,7 +83,6 @@ def classify_llm_gemini(title, description):
         response = model.generate_content(prompt)
         result = response.text.strip().lower()
         
-        # Validation
         valid_categories = ['technology', 'culture', 'other']
         if result in valid_categories:
             return result
@@ -98,18 +97,15 @@ def classify_llm_gemini(title, description):
 
 def classify_llm_ollama(title, description):
     try:
-        # Limiter la taille pour éviter les timeouts
         desc_short = description[:200] if description else ""
         
         print(f"Asking Ollama...")
         
-        # Utiliser la chain LangChain
         result = classification_chain.invoke({
             "title": title,
             "description": desc_short
         })
 
-        # Parser le résultat
         text = result.strip().lower()
         category = ''
 
