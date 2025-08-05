@@ -7,6 +7,13 @@ from urllib.parse import urlparse
 import re
 from html import unescape
 
+def clean_html_description(text):
+    """Nettoie le HTML et limite la longueur de la description"""
+    if not text:
+        return ''
+    text = re.sub(r'<[^>]+>', '', text)
+    text = unescape(text)    
+    return text.strip()[:200]
 
 def is_xml_feed(url):
     try:
@@ -15,13 +22,6 @@ def is_xml_feed(url):
         return 'xml' in content_type or 'rss' in content_type or url.endswith('.xml') or 'feed' in url
     except:
         return url.endswith('.xml') or 'rss' in url or 'feed' in url
-
-def clean_html_description(text):
-    if not text:
-        return ''
-    text = re.sub(r'<[^>]+>', '', text)
-    text = unescape(text)
-    return text.strip()
 
 def parse_rss_feed(url):
     try:
