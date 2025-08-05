@@ -33,7 +33,7 @@ for article in news:
 for article in news:
     title = article['name']
     description = article.get('description', '')    
-    category = llm.classify_llm_gemini(title, description)
+    category = llm.classify_llm_ollama(title, description)
     print(f"Classified {title} as {category}")
     if category != 'other':
         print(article)

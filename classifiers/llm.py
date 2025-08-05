@@ -1,6 +1,9 @@
 import config as cfg
 from openai import OpenAI
 import google.generativeai as genai
+from langchain_ollama import OllamaLLM
+from langchain.prompts import PromptTemplate
+
 
 config = cfg.Config()
 genai.configure(api_key=config.GOOGLE_API_KEY)
@@ -8,7 +11,32 @@ genai.configure(api_key=config.GOOGLE_API_KEY)
 openai_client = OpenAI(api_key=config.OPEN_AI_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+llm = OllamaLLM(
+    model=config.OLLAMA_MODEL,
+    temperature=0.1,
+    num_predict=10
+)
 
+
+classification_prompt = PromptTemplate(
+    input_variables=["title", "description"],
+    template="""
+Classify this news article into exactly one category: technology, culture, or other.
+        
+        Categories:
+        - technology: AI, software, gadgets, programming, tech companies, digital innovation and all around technology.
+        - culture: arts, music, cinema, literature, museums, entertainment, creative works and all around culture.
+        - other: politics, sports, economics, health, etc.
+        
+        Article:
+        Title: {title}
+        Description: {description}
+        
+Answer with only one word: technology, culture, or other
+"""
+)
+
+classification_chain = classification_prompt | llm
 
 
 def classify_llm_openai(title, description):
@@ -65,4 +93,35 @@ def classify_llm_gemini(title, description):
             
     except Exception as e:
         print(f"Gemini Error: {e}")
+        return 'other'
+    
+
+def classify_llm_ollama(title, description):
+    try:
+        # Limiter la taille pour éviter les timeouts
+        desc_short = description[:200] if description else ""
+        
+        print(f"Asking Ollama...")
+        
+        # Utiliser la chain LangChain
+        result = classification_chain.invoke({
+            "title": title,
+            "description": desc_short
+        })
+
+        # Parser le résultat
+        text = result.strip().lower()
+        category = ''
+
+        if 'technology' in text:
+            category = 'technology'
+        elif 'culture' in text:
+            category = 'culture'
+        else:
+            category = 'other'                
+        
+        return category
+        
+    except Exception as e:
+        print(f"LangChain Error: {e}")
         return 'other'

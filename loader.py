@@ -10,6 +10,6 @@ def load_news():
     df['url'] = df['url'].str.replace('feed/', '', regex=False)            
     df = df[df['url'].str.startswith('http')]    
     print(f"Loaded {len(df)} sources from CSV")
-    return df.to_dict(orient='records')  # Limiter à 20 pour le test
+    return df.to_dict(orient='records')[:5]  # Limiter à 20 pour le test
 
 
